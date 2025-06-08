@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "xtdb.s2-log"
+rootProject.name = "s2-log"

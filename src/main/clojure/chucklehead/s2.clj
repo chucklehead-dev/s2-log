@@ -4,7 +4,7 @@
             [xtdb.time :as time]
             [xtdb.util :as util])
   (:import [xtdb.api Xtdb$Config]
-           [chucklehead.s2 S2Log]))
+           [chucklehead.xtdb S2Log]))
 
 (defmethod xtn/apply-config! ::log
   [^Xtdb$Config config _ {:keys [token basin stream

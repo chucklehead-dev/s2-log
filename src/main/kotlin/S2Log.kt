@@ -5,7 +5,7 @@
     PathWithEnvVarSerde::class
 )
 
-package dev.chucklehead
+package chucklehead.xtdb
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.future

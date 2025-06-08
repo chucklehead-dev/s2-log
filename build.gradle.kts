@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.chucklehead"
-version = "1.0-SNAPSHOT"
+version = project.properties["version"]!!
 
 val defaultJvmArgs = listOf(
     "--add-opens=java.base/java.nio=ALL-UNNAMED",
