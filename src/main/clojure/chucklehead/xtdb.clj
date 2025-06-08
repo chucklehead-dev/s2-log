@@ -1,4 +1,4 @@
-(ns chucklehead.xtdb.s2
+(ns chucklehead.xtdb
   (:require [xtdb.api :as xt]
             [xtdb.node :as xtn]
             [xtdb.time :as time]
@@ -6,7 +6,7 @@
   (:import [xtdb.api Xtdb$Config]
            [chucklehead.xtdb.s2 S2Log]))
 
-(defmethod xtn/apply-config! ::log
+(defmethod xtn/apply-config! ::s2-log
   [^Xtdb$Config config _ {:keys [token basin stream
                                  max-append-in-flight-bytes
                                  append-timeout
