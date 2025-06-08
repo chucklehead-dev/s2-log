@@ -1,0 +1,15 @@
+[versions]
+s2 = "0.0.15"
+xtdb = "2.0.0-beta9"
+clojure = "1.12.0"
+coroutines-guava = "1.10.2"
+
+[libraries]
+s2-sdk = { module = "dev.s2:s2-sdk", version.ref = "s2" }
+xtdb-api = { module = "com.xtdb:xtdb-api", version.ref = "xtdb" }
+xtdb-core = { module = "com.xtdb:xtdb-core", version.ref = "xtdb" }
+clojure = { group = "org.clojure", name = "clojure", version.ref = "clojure" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines-guava" }
+
+[bundles]
+xtdb = ["xtdb-api", "xtdb-core"]
