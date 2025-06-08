@@ -1,10 +1,10 @@
-(ns chucklehead.s2
+(ns chucklehead.xtdb.s2
   (:require [xtdb.api :as xt]
             [xtdb.node :as xtn]
             [xtdb.time :as time]
             [xtdb.util :as util])
   (:import [xtdb.api Xtdb$Config]
-           [chucklehead.xtdb S2Log]))
+           [chucklehead.xtdb.s2 S2Log]))
 
 (defmethod xtn/apply-config! ::log
   [^Xtdb$Config config _ {:keys [token basin stream
