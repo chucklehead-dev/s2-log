@@ -19,4 +19,4 @@
                append-timeout (.appendTimeout (time/->duration append-timeout))
                read-buffer-bytes (.readBufferBytes read-buffer-bytes)
                retry-delay (.retryDelay (time/->duration retry-delay)
-               epoch (.epoch epoch)))))
+               epoch (.epoch epoch))))))
