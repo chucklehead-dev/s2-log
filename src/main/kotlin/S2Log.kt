@@ -77,7 +77,7 @@ class S2Log internal constructor(
                     while (true) {
 
                         val output = try {
-                            s.get()
+                            s.get(Duration.ofSeconds(1))
                         } catch (_: InterruptedException) {
                             throw InterruptedException()
                         }
