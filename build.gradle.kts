@@ -73,10 +73,10 @@ tasks.jar {
         )
     }
 }
-tasks.shadowJar {
-    minimize()
-    mergeServiceFiles()
-}
+//tasks.shadowJar {
+//    minimize()
+//    mergeServiceFiles()
+//}
 
 clojure {
     builds.forEach {
