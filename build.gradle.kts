@@ -1,4 +1,5 @@
 import dev.clojurephant.plugin.clojure.tasks.ClojureCompile
+import org.gradle.jvm.tasks.Jar
 
 plugins {
     `java-library`
@@ -41,39 +42,6 @@ dependencies {
     nrepl("cider", "cider-nrepl", "0.50.1")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            artifactId = "s2-log"
-            pom {
-                name.set("S2 Log for XTDB")
-                url.set("https://github.com/chucklehead-dev/s2-log")
-                licenses {
-                    license {
-                        name.set("Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    connection = "scm:git:git@github.com:chucklehead-dev/s2-log.git"
-                    url = "https://github.com/chucklehead-dev/s2-log"
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/chucklehead-dev/s2-log")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-
 tasks.test {
     useJUnitPlatform()
 }
@@ -111,5 +79,80 @@ tasks.clojureRepl {
 tasks.withType(ClojureCompile::class) {
     forkOptions.run {
         jvmArgs = defaultJvmArgs
+    }
+}
+
+val uberjar = tasks.register("uberjar", Jar::class) {
+    archiveBaseName = "${project.name}-uber"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Implementation-Version"] = version
+        attributes["Implementation-Title"] = "XTDB S2 Log - All-in-one"
+//        attributes["Main-Class"] = "chucklehead.xtdb.s2.S2Log"
+    }
+    from(  configurations.runtimeClasspath.get().map ({ if (it.isDirectory)  it else zipTree(it) }) )
+    with(tasks.jar.get() as CopySpec)
+}
+
+tasks {
+    "build" {
+        dependsOn("uberjar")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("jar") {
+            groupId = project.group.toString()
+            artifactId = "s2-log"
+            version = project.version.toString()
+            artifact(tasks.jar)
+            pom {
+                name.set("S2 Log for XTDB")
+                url.set("https://github.com/chucklehead-dev/s2-log")
+                licenses {
+                    license {
+                        name.set("Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    connection = "scm:git:git@github.com:chucklehead-dev/s2-log.git"
+                    url = "https://github.com/chucklehead-dev/s2-log"
+                }
+            }
+        }
+
+        create<MavenPublication>("uberjar") {
+            groupId = project.group.toString()
+            artifactId = "s2-log-uberjar"
+            version = project.version.toString()
+            artifact(uberjar)
+            pom {
+                name.set("S2 Log for XTDB - All-in-one")
+                url.set("https://github.com/chucklehead-dev/s2-log")
+                licenses {
+                    license {
+                        name.set("Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    connection = "scm:git:git@github.com:chucklehead-dev/s2-log.git"
+                    url = "https://github.com/chucklehead-dev/s2-log"
+                }
+            }
+        }
+
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/chucklehead-dev/s2-log")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
