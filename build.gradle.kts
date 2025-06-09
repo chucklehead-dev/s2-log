@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
     implementation(libs.kotlinx.coroutines)
+    implementation(libs.grpc)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
