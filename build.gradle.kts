@@ -36,8 +36,8 @@ repositories {
 
 dependencies {
     implementation(libs.bundles.xtdb)
-    api(libs.s2.sdk)
-    api(libs.kotlinx.coroutines.guava)
+    implementation(libs.s2.sdk)
+    implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
@@ -98,17 +98,11 @@ tasks.withType(ClojureCompile::class) {
 publishing {
     publications {
         create<MavenPublication>("jar") {
-            artifactId = "s2-log"
-            artifact(tasks.jar)
+            from(components["java"])
             pom {
-                name.set("S2 Log for XTDB")
+
                 url.set("https://github.com/chucklehead-dev/s2-log")
-                licenses {
-                    license {
-                        name.set("Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
+
                 scm {
                     connection = "scm:git:git@github.com:chucklehead-dev/s2-log.git"
                     url = "https://github.com/chucklehead-dev/s2-log"
