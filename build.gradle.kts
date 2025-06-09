@@ -90,6 +90,7 @@ val uberjar = tasks.register("uberjar", Jar::class) {
         attributes["Implementation-Title"] = "XTDB S2 Log - All-in-one"
 //        attributes["Main-Class"] = "chucklehead.xtdb.s2.S2Log"
     }
+    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
     from(  configurations.runtimeClasspath.get().map ({ if (it.isDirectory)  it else zipTree(it) }) )
     with(tasks.jar.get() as CopySpec)
 }
