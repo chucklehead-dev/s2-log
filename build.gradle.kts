@@ -1,11 +1,11 @@
 import dev.clojurephant.plugin.clojure.tasks.ClojureCompile
-import org.gradle.jvm.tasks.Jar
 
 plugins {
     `java-library`
     id("dev.clojurephant.clojure") version "0.8.0"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
+    id("com.gradleup.shadow") version "9.0.0-beta15"
     `maven-publish`
 }
 
@@ -57,6 +57,10 @@ tasks.jar {
         )
     }
 }
+tasks.shadowJar {
+    minimize()
+    mergeServiceFiles()
+}
 
 clojure {
     builds.forEach {
@@ -79,25 +83,6 @@ tasks.clojureRepl {
 tasks.withType(ClojureCompile::class) {
     forkOptions.run {
         jvmArgs = defaultJvmArgs
-    }
-}
-
-val uberjar = tasks.register("uberjar", Jar::class) {
-    archiveBaseName = "${project.name}-uber"
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest {
-        attributes["Implementation-Version"] = version
-        attributes["Implementation-Title"] = "XTDB S2 Log - All-in-one"
-//        attributes["Main-Class"] = "chucklehead.xtdb.s2.S2Log"
-    }
-    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
-    from(  configurations.runtimeClasspath.get().map ({ if (it.isDirectory)  it else zipTree(it) }) )
-    with(tasks.jar.get() as CopySpec)
-}
-
-tasks {
-    "build" {
-        dependsOn("uberjar")
     }
 }
 
@@ -125,24 +110,7 @@ publishing {
         }
 
         create<MavenPublication>("uberjar") {
-            groupId = project.group.toString()
-            artifactId = "s2-log-uberjar"
-            version = project.version.toString()
-            artifact(uberjar)
-            pom {
-                name.set("S2 Log for XTDB - All-in-one")
-                url.set("https://github.com/chucklehead-dev/s2-log")
-                licenses {
-                    license {
-                        name.set("Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    connection = "scm:git:git@github.com:chucklehead-dev/s2-log.git"
-                    url = "https://github.com/chucklehead-dev/s2-log"
-                }
-            }
+            from(components["shadow"])
         }
 
     }
