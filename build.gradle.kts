@@ -6,7 +6,6 @@ plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
     `maven-publish`
-
 }
 
 group = "dev.chucklehead"
@@ -37,11 +36,9 @@ repositories {
 
 dependencies {
     implementation(libs.bundles.xtdb)
-    implementation(libs.s2.sdk)
-    implementation(libs.kotlinx.coroutines.guava)
+    api(libs.s2.sdk)
+    api(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
-    implementation(libs.kotlinx.coroutines)
-//    implementation(libs.grpc)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
@@ -73,10 +70,6 @@ tasks.jar {
         )
     }
 }
-//tasks.shadowJar {
-//    minimize()
-//    mergeServiceFiles()
-//}
 
 clojure {
     builds.forEach {
@@ -122,11 +115,6 @@ publishing {
                 }
             }
         }
-
-//        create<MavenPublication>("uberjar") {
-//            artifactId = "s2-log-all"
-//            from(components["shadow"])
-//        }
 
     }
     repositories {
