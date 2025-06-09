@@ -3,13 +3,23 @@ s2 = "0.0.15"
 xtdb = "2.0.0-beta9"
 clojure = "1.12.0"
 coroutines-guava = "1.10.2"
+kotlin-coroutines = "1.10.2"
+junit = "5.12.2"
+junit-launcher = "1.12.2"
+junit-jupiter-api={ group="org.junit.jupiter", name="junit-jupiter-api", version.ref="junit" }
+junit-jupiter-engine={ group="org.junit.jupiter", name="junit-jupiter-engine", version.ref="junit" }
+junit-platform-launcher ={ group="org.junit.platform", name="junit-platform-launcher", version.ref="junit-launcher" }
 
 [libraries]
 s2-sdk = { module = "dev.s2:s2-sdk", version.ref = "s2" }
 xtdb-api = { module = "com.xtdb:xtdb-api", version.ref = "xtdb" }
 xtdb-core = { module = "com.xtdb:xtdb-core", version.ref = "xtdb" }
 clojure = { group = "org.clojure", name = "clojure", version.ref = "clojure" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines-guava" }
+mockk = { group = "io.mockk", name = "mockk", version = "1.13.17" }
+
 
 [bundles]
 xtdb = ["xtdb-api", "xtdb-core"]

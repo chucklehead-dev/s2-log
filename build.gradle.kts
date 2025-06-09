@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.gradleup.shadow") version "9.0.0-beta15"
     `maven-publish`
+    id("idea")
 }
 
 group = "dev.chucklehead"
@@ -26,11 +27,13 @@ val defaultJvmArgs = listOf(
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.clojars.org/") }
-    maven { url = uri("https://maven.pkg.github.com/s2-streamstore/s2-sdk-java")
-    credentials {
-        username = System.getenv("GITHUB_ACTOR")
-        password = System.getenv("GITHUB_TOKEN")
-    }}
+    maven {
+        url = uri("https://maven.pkg.github.com/s2-streamstore/s2-sdk-java")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -38,12 +41,25 @@ dependencies {
     implementation(libs.s2.sdk)
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
+    implementation(libs.kotlinx.coroutines)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testImplementation(libs.mockk)
     nrepl("cider", "cider-nrepl", "0.50.1")
 }
 
 tasks.test {
-    useJUnitPlatform()
+    jvmArgs(defaultJvmArgs)
+    useJUnitPlatform {
+        excludeTags("integration")
+    }
+}
+
+tasks.register("integration-test", Test::class) {
+    jvmArgs(defaultJvmArgs)
+    useJUnitPlatform {
+        includeTags("integration")
+    }
 }
 
 java {
