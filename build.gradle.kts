@@ -89,9 +89,7 @@ tasks.withType(ClojureCompile::class) {
 publishing {
     publications {
         create<MavenPublication>("jar") {
-            groupId = project.group.toString()
             artifactId = "s2-log"
-            version = project.version.toString()
             artifact(tasks.jar)
             pom {
                 name.set("S2 Log for XTDB")
@@ -110,6 +108,7 @@ publishing {
         }
 
         create<MavenPublication>("uberjar") {
+            artifactId = "s2-log-all"
             from(components["shadow"])
         }
 
