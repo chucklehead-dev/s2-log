@@ -5,9 +5,8 @@ plugins {
     id("dev.clojurephant.clojure") version "0.8.0"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
-    id("com.gradleup.shadow") version "9.0.0-beta15"
     `maven-publish`
-    id("idea")
+
 }
 
 group = "dev.chucklehead"
@@ -42,7 +41,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
     implementation(libs.kotlinx.coroutines)
-    implementation(libs.grpc)
+//    implementation(libs.grpc)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
     testImplementation(libs.mockk)
@@ -124,10 +123,10 @@ publishing {
             }
         }
 
-        create<MavenPublication>("uberjar") {
-            artifactId = "s2-log-all"
-            from(components["shadow"])
-        }
+//        create<MavenPublication>("uberjar") {
+//            artifactId = "s2-log-all"
+//            from(components["shadow"])
+//        }
 
     }
     repositories {

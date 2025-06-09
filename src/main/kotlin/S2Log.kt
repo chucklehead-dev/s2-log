@@ -16,6 +16,7 @@ import kotlinx.serialization.UseSerializers
 import s2.client.StreamClient
 import s2.config.AppendRetryPolicy
 import s2.config.Config
+import s2.client.ManagedAppendSession
 import s2.types.*
 import xtdb.DurationSerde
 import xtdb.api.PathWithEnvVarSerde
