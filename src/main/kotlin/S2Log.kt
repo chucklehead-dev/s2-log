@@ -16,7 +16,6 @@ import kotlinx.serialization.UseSerializers
 import s2.client.StreamClient
 import s2.config.AppendRetryPolicy
 import s2.config.Config
-import s2.client.ManagedAppendSession
 import s2.types.*
 import xtdb.DurationSerde
 import xtdb.api.PathWithEnvVarSerde
@@ -30,6 +29,7 @@ import xtdb.api.module.XtdbModule
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 class S2Log internal constructor(
@@ -48,7 +48,6 @@ class S2Log internal constructor(
     }
 
     private fun readLatestSubmittedMessage(client: StreamClient): LogOffset = client.checkTail().get() - 1
-
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
     override val latestSubmittedOffset get() = latestSubmittedOffset0.get()
 
@@ -68,38 +67,30 @@ class S2Log internal constructor(
             val req = ReadSessionRequest.newBuilder()
                 .withHeartbeats(false)
                 .withReadLimit(ReadLimit.NONE)
-                .withStart(Start.SeqNum.seqNum(latestProcessedOffset))
+                .withStart(Start.SeqNum.seqNum(latestProcessedOffset.coerceAtLeast(0)))
                 .build()
-
             val session = client.managedReadSession(req, readBufferBytes)
 
             session.use { s ->
                 runInterruptible(Dispatchers.IO) {
-                    while (true) {
-
+                    while (!session.isClosed) {
                         val output = try {
-                            s.get(Duration.ofSeconds(1))
+                            s.get(Duration.ofSeconds(1)).getOrNull()
                         } catch (_: InterruptedException) {
                             throw InterruptedException()
                         }
 
-                        output.ifPresent { o ->
-                            when (o) {
-                                is Batch -> subscriber.processRecords(
-                                    o.sequencedRecordBatch.records.map { r ->
-                                        Record(
-                                            r.seqNum,
-                                            r.timestamp,
-                                            Message.parse(r.body.asReadOnlyByteBuffer())
-                                        )
-                                    }
+                        if (output != null && output is Batch) {
+                            subscriber.processRecords(output.sequencedRecordBatch.records.map { r ->
+                                Record(
+                                    r.seqNum,
+                                    r.timestamp,
+                                    Message.parse(r.body.asReadOnlyByteBuffer())
                                 )
-                            }
+                            })
                         }
-
                     }
                 }
-
             }
         }
         return Subscription { runBlocking { withTimeout(5.seconds) { job.cancelAndJoin() } } }
@@ -107,13 +98,11 @@ class S2Log internal constructor(
 
     companion object {
         @JvmStatic
-        fun s2(token:String, basin: String, stream: String) =
-            Factory(token, basin, stream)
+        fun s2(token: String, basin: String, stream: String) = Factory(token, basin, stream)
 
         @JvmSynthetic
         fun Xtdb.Config.s2(
-            token: String, basin: String, stream: String,
-            configure: Factory.() -> Unit = {}
+            token: String, basin: String, stream: String, configure: Factory.() -> Unit = {}
         ) {
             log = S2Log.s2(token, basin, stream).also(configure)
         }
