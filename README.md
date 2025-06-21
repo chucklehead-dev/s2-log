@@ -27,9 +27,8 @@ See [here](https://docs.github.com/en/packages/working-with-a-github-packages-re
 
 #### Clojure
 ```clojure
-{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.1"}}
- :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}
-             "s2" {:url "https://maven.pkg.github.com/s2-streamstore/s2-sdk-java"}}}
+{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.3"}}
+ :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}}}
 ```
 
 ## Configuration
