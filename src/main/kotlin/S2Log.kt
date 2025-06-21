@@ -26,6 +26,8 @@ import xtdb.api.log.Log
 import xtdb.api.log.Log.*
 import xtdb.api.log.LogOffset
 import xtdb.api.module.XtdbModule
+import xtdb.util.info
+import xtdb.util.logger
 import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.Instant
@@ -42,6 +44,7 @@ class S2Log internal constructor(
 ) : Log {
     private val appender = client.managedAppendSession()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val LOGGER = S2Log::class.logger
 
     override fun close() {
         runBlocking { withTimeout(5.seconds) { scope.coroutineContext.job.cancelAndJoin() } }
@@ -62,7 +65,10 @@ class S2Log internal constructor(
             val output = appender.submit(input, appendTimeout).await()
             val offset = output.end.seqNum - 1
             val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
-            MessageMetadata(latest, Instant.ofEpochMilli(  output.end.timestamp))
+            val result = MessageMetadata(latest, Instant.ofEpochMilli(  output.end.timestamp))
+            LOGGER.info("Append output: ${output.toString()}")
+            LOGGER.info("Append result: ${result.toString()}")
+            result
         }
 
     override fun subscribe(subscriber: Subscriber, latestProcessedOffset: LogOffset): Subscription {
@@ -85,11 +91,14 @@ class S2Log internal constructor(
 
                         if (output != null && output is Batch) {
                             subscriber.processRecords(output.sequencedRecordBatch.records.map { r ->
-                                Record(
+                                val result = Record(
                                     r.seqNum,
                                     Instant.ofEpochMilli(r.timestamp),
                                     Message.parse(r.body.asReadOnlyByteBuffer())
                                 )
+                                LOGGER.info("Subscriber got record: ${r.toString()}")
+                                LOGGER.info("Subscriber result: ${result.toString()}")
+                                result
                             })
                         }
                     }
