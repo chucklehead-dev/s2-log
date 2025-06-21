@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.bundles.s2)
     implementation(libs.bundles.xtdb)
     implementation(libs.kotlinx.coroutines.guava)
+    runtimeOnly(libs.guava)
     implementation(libs.clojure)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
