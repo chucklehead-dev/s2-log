@@ -3,7 +3,7 @@ import dev.clojurephant.plugin.clojure.tasks.ClojureCompile
 plugins {
     `java-library`
     id("dev.clojurephant.clojure") version "0.8.0"
-//    id("com.gradleup.shadow") version "8.3.6"
+    id("com.gradleup.shadow") version "8.3.6"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
     `maven-publish`
@@ -72,15 +72,15 @@ tasks.jar {
     }
 }
 
-//tasks.shadowJar {
-//    archiveClassifier = ""
-//    dependencies {
-//        include {
-//            it.moduleGroup == "dev.s2"
-//        }
-//    }
-//}
-//
+tasks.shadowJar {
+    archiveClassifier = ""
+    dependencies {
+        include {
+            it.moduleGroup == "dev.s2"
+        }
+    }
+}
+
 clojure {
     builds.forEach {
         it.checkNamespaces.empty()
@@ -107,8 +107,8 @@ clojure {
 
 publishing {
     publications {
-        create<MavenPublication>("jar") {
-            from(components["java"])
+        create<MavenPublication>("shadow") {
+            from(components["shadow"])
             pom {
 
                 url.set("https://github.com/chucklehead-dev/s2-log")
