@@ -26,7 +26,9 @@ import xtdb.api.log.Log
 import xtdb.api.log.Log.*
 import xtdb.api.log.LogOffset
 import xtdb.api.module.XtdbModule
+import java.lang.IllegalArgumentException
 import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.jvm.optionals.getOrNull
@@ -47,19 +49,20 @@ class S2Log internal constructor(
         client.close()
     }
 
-    private fun readLatestSubmittedMessage(client: StreamClient): LogOffset = client.checkTail().get() - 1
+    private fun readLatestSubmittedMessage(client: StreamClient): LogOffset = client.checkTail().get().seqNum - 1
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
     override val latestSubmittedOffset get() = latestSubmittedOffset0.get()
 
-    override fun appendMessage(message: Message): CompletableFuture<LogOffset> =
+    override fun appendMessage(message: Message): CompletableFuture<MessageMetadata> =
         scope.future {
             val record = AppendRecord.newBuilder()
                 .withBody(message.encode().array())
                 .build()
             val input = AppendInput.newBuilder().withRecords(listOf(record)).build()
             val output = appender.submit(input, appendTimeout).await()
-            val offset = output.endSeqNum - 1
-            latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
+            val offset = output.end.seqNum - 1
+            val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
+            MessageMetadata(latest, Instant.ofEpochMilli(  output.end.timestamp))
         }
 
     override fun subscribe(subscriber: Subscriber, latestProcessedOffset: LogOffset): Subscription {
@@ -84,7 +87,7 @@ class S2Log internal constructor(
                             subscriber.processRecords(output.sequencedRecordBatch.records.map { r ->
                                 Record(
                                     r.seqNum,
-                                    r.timestamp,
+                                    Instant.ofEpochMilli(r.timestamp),
                                     Message.parse(r.body.asReadOnlyByteBuffer())
                                 )
                             })
@@ -128,6 +131,15 @@ class S2Log internal constructor(
         fun retryDelay(delay: Duration) = apply { this.retryDelay = delay }
 
         override fun openLog(): S2Log {
+            if (token.isEmpty()) {
+                throw IllegalArgumentException("token cannot be empty")
+            }
+            if (basin.isEmpty()) {
+                throw IllegalArgumentException("basin cannot be empty")
+            }
+            if (stream.isEmpty()) {
+                throw IllegalArgumentException("stream cannot be empty")
+            }
             val config = Config.newBuilder(token)
                 .withCompression(true)
                 .withAppendRetryPolicy(AppendRetryPolicy.NO_SIDE_EFFECTS)

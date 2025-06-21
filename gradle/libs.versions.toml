@@ -1,5 +1,5 @@
 [versions]
-s2 = "0.0.15"
+s2 = "0.0.16"
 xtdb = "2.0.0"
 clojure = "1.12.0"
 coroutines-guava = "1.10.2"
