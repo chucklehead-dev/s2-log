@@ -13,6 +13,7 @@ import kotlinx.coroutines.guava.await
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.slf4j.LoggerFactory
 import s2.client.StreamClient
 import s2.config.AppendRetryPolicy
 import s2.config.Config
@@ -26,8 +27,6 @@ import xtdb.api.log.Log
 import xtdb.api.log.Log.*
 import xtdb.api.log.LogOffset
 import xtdb.api.module.XtdbModule
-import xtdb.util.info
-import xtdb.util.logger
 import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.Instant
@@ -35,6 +34,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
+
+private val LOGGER = LoggerFactory.getLogger(S2Log::class.java)
 
 class S2Log internal constructor(
     private val client: StreamClient,
@@ -44,7 +45,7 @@ class S2Log internal constructor(
 ) : Log {
     private val appender = client.managedAppendSession()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val LOGGER = S2Log::class.logger
+
 
     override fun close() {
         runBlocking { withTimeout(5.seconds) { scope.coroutineContext.job.cancelAndJoin() } }
