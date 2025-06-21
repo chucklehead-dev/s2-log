@@ -74,11 +74,11 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveClassifier = ""
-    dependencies {
-        include {
-            it.moduleGroup == "dev.s2"
-        }
-    }
+//    dependencies {
+//        include {
+//            it.moduleGroup == "dev.s2"
+//        }
+//    }
 }
 
 clojure {
