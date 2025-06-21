@@ -67,8 +67,9 @@ class S2Log internal constructor(
             val offset = output.end.seqNum - 1
             val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
             val result = MessageMetadata(latest, Instant.ofEpochMilli(  output.end.timestamp))
-            LOGGER.info("Append output: ${output.toString()}")
-            LOGGER.info("Append result: ${result.toString()}")
+            LOGGER.info("Append output, end seq: {}, end ts: {}", output.end.seqNum, output.end.timestamp)
+            LOGGER.info("Append result, offset: {}, ts: {}", result.logOffset, result.logTimestamp)
+
             result
         }
 
@@ -97,8 +98,8 @@ class S2Log internal constructor(
                                     Instant.ofEpochMilli(r.timestamp),
                                     Message.parse(r.body.asReadOnlyByteBuffer())
                                 )
-                                LOGGER.info("Subscriber got record: ${r.toString()}")
-                                LOGGER.info("Subscriber result: ${result.toString()}")
+                                LOGGER.info("Subscriber got record, seq: {}, ts: {}", r.seqNum, r.timestamp)
+                                LOGGER.info("Subscriber result, offset: {}, ts: {}", result.logOffset, result.logTimestamp )
                                 result
                             })
                         }
