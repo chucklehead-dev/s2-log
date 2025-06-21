@@ -58,7 +58,11 @@ class S2Log internal constructor(
         return tail.seqNum - 1
     }
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
-    override val latestSubmittedOffset get() = latestSubmittedOffset0.get()
+    override val latestSubmittedOffset get(): Long {
+        val offset = latestSubmittedOffset0.get()
+        LOGGER.info("latest submitted offset: {}", offset)
+        return offset
+    }
 
     override fun appendMessage(message: Message): CompletableFuture<MessageMetadata> =
         scope.future {
