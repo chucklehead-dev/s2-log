@@ -38,6 +38,7 @@ repositories {
 dependencies {
     implementation(libs.s2.sdk)
     implementation(libs.bundles.xtdb)
+    implementation(libs.bundles.grpc)
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
     testImplementation(libs.kotlinx.coroutines.test)
