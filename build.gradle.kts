@@ -108,8 +108,8 @@ tasks.withType(ClojureCompile::class) {
 
 publishing {
     publications {
-        create<MavenPublication>("shadow") {
-            from(components["shadow"])
+        create<MavenPublication>("jar") {
+            from(components["jar"])
             pom {
 
                 url.set("https://github.com/chucklehead-dev/s2-log")
