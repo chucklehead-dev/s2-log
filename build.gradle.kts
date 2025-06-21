@@ -3,7 +3,7 @@ import dev.clojurephant.plugin.clojure.tasks.ClojureCompile
 plugins {
     `java-library`
     id("dev.clojurephant.clojure") version "0.8.0"
-    id("com.gradleup.shadow") version "8.3.6"
+//    id("com.gradleup.shadow") version "8.3.6"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
     `maven-publish`
@@ -38,7 +38,6 @@ repositories {
 dependencies {
     implementation(libs.s2.sdk)
     implementation(libs.bundles.xtdb)
-    implementation(libs.bundles.grpc)
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.clojure)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -73,38 +72,38 @@ tasks.jar {
     }
 }
 
-tasks.shadowJar {
-    archiveClassifier = ""
-    dependencies {
-        include {
-            it.moduleGroup == "dev.s2"
-        }
-    }
-}
-
+//tasks.shadowJar {
+//    archiveClassifier = ""
+//    dependencies {
+//        include {
+//            it.moduleGroup == "dev.s2"
+//        }
+//    }
+//}
+//
 clojure {
     builds.forEach {
         it.checkNamespaces.empty()
     }
 }
-
-tasks.clojureRepl {
-    doFirst {
-        project.ext.set("buildEnv", "repl")
-    }
-
-    forkOptions.run {
-        jvmArgs = defaultJvmArgs
-    }
-
-    middleware.add("cider.nrepl/cider-middleware")
-}
-
-tasks.withType(ClojureCompile::class) {
-    forkOptions.run {
-        jvmArgs = defaultJvmArgs
-    }
-}
+//
+//tasks.clojureRepl {
+//    doFirst {
+//        project.ext.set("buildEnv", "repl")
+//    }
+//
+//    forkOptions.run {
+//        jvmArgs = defaultJvmArgs
+//    }
+//
+//    middleware.add("cider.nrepl/cider-middleware")
+//}
+//
+//tasks.withType(ClojureCompile::class) {
+//    forkOptions.run {
+//        jvmArgs = defaultJvmArgs
+//    }
+//}
 
 publishing {
     publications {
