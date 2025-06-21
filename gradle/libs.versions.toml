@@ -26,7 +26,7 @@ grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc"}
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc"}
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc"}
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
-guava = { module = "com.google:guava", version.ref = "guava"}
+guava = { module = "com.google.guava:guava", version.ref = "guava"}
 
 [bundles]
 xtdb = ["xtdb-api", "xtdb-core"]
