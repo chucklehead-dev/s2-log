@@ -52,7 +52,11 @@ class S2Log internal constructor(
         client.close()
     }
 
-    private fun readLatestSubmittedMessage(client: StreamClient): LogOffset = client.checkTail().get().seqNum - 1
+    private fun readLatestSubmittedMessage(client: StreamClient): LogOffset {
+        val tail = client.checkTail().get()
+        LOGGER.info("checkTail result, seq: {}, ts: {}", tail.seqNum, tail.timestamp)
+        return tail.seqNum - 1
+    }
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
     override val latestSubmittedOffset get() = latestSubmittedOffset0.get()
 
@@ -66,19 +70,20 @@ class S2Log internal constructor(
             val offset = output.end.seqNum - 1
             val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
             val result = MessageMetadata(latest, Instant.ofEpochMilli(output.end.timestamp))
-            LOGGER.info("Append output, end seq: {}, end ts: {}", output.end.seqNum, output.end.timestamp)
-            LOGGER.info("Append result, offset: {}, ts: {}", result.logOffset, result.logTimestamp)
+            LOGGER.info("Appended message, submit end seq: {}, submit end ts: {}, message seq: {}, message ts: {}", output.end.seqNum, output.end.timestamp, result.logOffset, result.logTimestamp)
 
             result
         }
 
     override fun subscribe(subscriber: Subscriber, latestProcessedOffset: LogOffset): Subscription {
+        val start = latestProcessedOffset.coerceAtLeast(0)
         val job = scope.launch {
             val req = ReadSessionRequest.newBuilder()
                 .withHeartbeats(false)
                 .withReadLimit(ReadLimit.NONE)
-                .withStart(Start.SeqNum.seqNum(latestProcessedOffset.coerceAtLeast(0)))
+                .withStart(Start.SeqNum.seqNum(start))
                 .build()
+            LOGGER.info("Starting new subscription at offset: {}", start)
             val session = client.managedReadSession(req, readBufferBytes)
 
             session.use { s ->
@@ -101,7 +106,7 @@ class S2Log internal constructor(
                                         Instant.ofEpochMilli(r.timestamp),
                                         Message.parse(r.body.asReadOnlyByteBuffer())
                                     )
-                                    LOGGER.info("Subscriber got record, seq: {}, ts: {}", r.seqNum, r.timestamp)
+                                    LOGGER.info("Subscriber received record, seq: {}, ts: {}", r.seqNum, r.timestamp)
                                     LOGGER.info(
                                         "Subscriber result, offset: {}, ts: {}",
                                         result.logOffset,
@@ -149,22 +154,17 @@ class S2Log internal constructor(
         fun retryDelay(delay: Duration) = apply { this.retryDelay = delay }
 
         override fun openLog(): S2Log {
-            if (token.isEmpty()) {
-                throw IllegalArgumentException("token cannot be empty")
-            }
-            if (basin.isEmpty()) {
-                throw IllegalArgumentException("basin cannot be empty")
-            }
-            if (stream.isEmpty()) {
-                throw IllegalArgumentException("stream cannot be empty")
-            }
+            check(token.isNotEmpty()) { "token must not be empty" }
+            check(basin.isNotEmpty()) { "basin must not be empty" }
+            check(stream.isNotEmpty()) { "stream must not be empty" }
+
             val config = Config.newBuilder(token)
                 .withCompression(true)
                 .withAppendRetryPolicy(AppendRetryPolicy.NO_SIDE_EFFECTS)
                 .withMaxAppendInflightBytes(maxAppendInFlightBytes)
                 .withRetryDelay(retryDelay)
                 .build()
-
+            LOGGER.info("Opening log for basin: {}, stream: {}", basin, stream)
             val client = StreamClient.newBuilder(config, basin, stream).build()
 
             return S2Log(client, appendTimeout, readBufferBytes, epoch)
