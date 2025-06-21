@@ -6,7 +6,7 @@ coroutines-guava = "1.10.2"
 kotlin-coroutines = "1.10.2"
 junit = "5.12.2"
 junit-launcher = "1.12.2"
-grpc = "1.73.0"
+grpc = "1.64.0"
 
 [libraries]
 junit-jupiter-api={ group="org.junit.jupiter", name="junit-jupiter-api", version.ref="junit" }
@@ -20,8 +20,9 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines-guava" }
 mockk = { group = "io.mockk", name = "mockk", version = "1.13.17" }
-grpc = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc"}
-
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc"}
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc"}
 
 [bundles]
 xtdb = ["xtdb-api", "xtdb-core"]
+grpc = ["grpc-protobuf", "grpc-stub"]
