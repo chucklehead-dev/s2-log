@@ -27,8 +27,9 @@ See [here](https://docs.github.com/en/packages/working-with-a-github-packages-re
 
 #### Clojure
 ```clojure
-{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.4"}}
- :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}}}
+{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.3"}}
+ :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}
+             "s2" {:url "https://maven.pkg.github.com/s2-streamstore/s2-sdk-java"}}}
 ```
 
 ## Configuration
@@ -50,7 +51,7 @@ Note that `::cxt/s2-log` replaces the entire `:log` element from the [Clojure Co
   (require '[chucklehead.xtdb :as cxt])
   (require '[xtdb.node :as xtn])
   
-  (xtn/start-node {::cxt/s2-log {:token (System/getenv "S2_ACCESS_TOKEN")
-                                 :basin (System/getenv "S2_BASIN")
-                                 :stream (System/getenv "S2_STREAM")}})
+  (def n (xtn/start-node {::cxt/s2-log {:token (System/getenv "S2_ACCESS_TOKEN")
+                                        :basin (System/getenv "S2_BASIN")
+                                        :stream (System/getenv "S2_STREAM")}})))
 ```
