@@ -27,7 +27,6 @@ import xtdb.api.log.Log
 import xtdb.api.log.Log.*
 import xtdb.api.log.LogOffset
 import xtdb.api.module.XtdbModule
-import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CompletableFuture
@@ -66,7 +65,7 @@ class S2Log internal constructor(
             val output = appender.submit(input, appendTimeout).await()
             val offset = output.end.seqNum - 1
             val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
-            val result = MessageMetadata(latest, Instant.ofEpochMilli(  output.end.timestamp))
+            val result = MessageMetadata(latest, Instant.ofEpochMilli(output.end.timestamp))
             LOGGER.info("Append output, end seq: {}, end ts: {}", output.end.seqNum, output.end.timestamp)
             LOGGER.info("Append result, offset: {}, ts: {}", result.logOffset, result.logTimestamp)
 
@@ -92,16 +91,24 @@ class S2Log internal constructor(
                         }
 
                         if (output != null && output is Batch) {
-                            subscriber.processRecords(output.sequencedRecordBatch.records.map { r ->
-                                val result = Record(
-                                    r.seqNum,
-                                    Instant.ofEpochMilli(r.timestamp),
-                                    Message.parse(r.body.asReadOnlyByteBuffer())
-                                )
-                                LOGGER.info("Subscriber got record, seq: {}, ts: {}", r.seqNum, r.timestamp)
-                                LOGGER.info("Subscriber result, offset: {}, ts: {}", result.logOffset, result.logTimestamp )
-                                result
-                            })
+                            subscriber.processRecords(
+                                output.sequencedRecordBatch.records
+                                .filterNot { r ->
+                                    r.headers.any { h -> h.name.isEmpty }
+                                }.map { r ->
+                                    val result = Record(
+                                        r.seqNum,
+                                        Instant.ofEpochMilli(r.timestamp),
+                                        Message.parse(r.body.asReadOnlyByteBuffer())
+                                    )
+                                    LOGGER.info("Subscriber got record, seq: {}, ts: {}", r.seqNum, r.timestamp)
+                                    LOGGER.info(
+                                        "Subscriber result, offset: {}, ts: {}",
+                                        result.logOffset,
+                                        result.logTimestamp
+                                    )
+                                    result
+                                })
                         }
                     }
                 }
