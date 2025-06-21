@@ -23,6 +23,7 @@ import xtdb.api.StringMapWithEnvVarsSerde
 import xtdb.api.StringWithEnvVarSerde
 import xtdb.api.Xtdb
 import xtdb.api.log.Log
+import xtdb.api.log.Log.MessageMetadata
 import xtdb.api.log.Log.*
 import xtdb.api.log.LogOffset
 import xtdb.api.module.XtdbModule
