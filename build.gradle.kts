@@ -73,6 +73,7 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    archiveClassifier = ""
     dependencies {
         include {
             it.moduleGroup == "dev.s2"

@@ -27,7 +27,7 @@ See [here](https://docs.github.com/en/packages/working-with-a-github-packages-re
 
 #### Clojure
 ```clojure
-{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.3"}}
+{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.4"}}
  :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}}}
 ```
 
