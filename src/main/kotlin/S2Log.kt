@@ -80,7 +80,7 @@ class S2Log internal constructor(
         }
 
     override fun subscribe(subscriber: Subscriber, latestProcessedOffset: LogOffset): Subscription {
-        val start = latestProcessedOffset.coerceAtLeast(0)
+        val start = (latestProcessedOffset+1).coerceAtLeast(0)
         val job = scope.launch {
             val req = ReadSessionRequest.newBuilder()
                 .withHeartbeats(false)
