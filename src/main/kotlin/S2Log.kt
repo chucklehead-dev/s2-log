@@ -145,7 +145,7 @@ class S2Log internal constructor(
         val token: String,
         val basin: String,
         val stream: String,
-        var maxAppendInFlightBytes: Int = (1 * 1024 * 1024),
+        var maxAppendInFlightBytes: Int = (4 * 1024 * 1024),
         var appendTimeout: Duration = Duration.ofSeconds(5),
         var readBufferBytes: Int = (4 * 1024 * 1024),
         var retryDelay: Duration = Duration.ofSeconds(1),
