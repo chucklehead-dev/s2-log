@@ -47,20 +47,23 @@ class S2Log internal constructor(
 
 
     override fun close() {
+        LOGGER.trace("Closing log subscriptions")
         runBlocking { withTimeout(5.seconds) { scope.coroutineContext.job.cancelAndJoin() } }
+        LOGGER.trace("Closing log appender")
         appender.closeGracefully()
         client.close()
+        LOGGER.info("Closed log")
     }
 
     private fun readLatestSubmittedMessage(client: StreamClient): LogOffset {
         val tail = client.checkTail().get()
-        LOGGER.info("checkTail result, seq: {}, ts: {}", tail.seqNum, tail.timestamp)
+        LOGGER.trace("checkTail result, seq: {}, ts: {}", tail.seqNum, tail.timestamp)
         return tail.seqNum - 1
     }
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
     override val latestSubmittedOffset get(): Long {
         val offset = latestSubmittedOffset0.get()
-        LOGGER.info("latest submitted offset: {}", offset)
+        LOGGER.trace("latest submitted offset: {}", offset)
         return offset
     }
 
@@ -74,7 +77,7 @@ class S2Log internal constructor(
             val offset = output.end.seqNum - 1
             val latest = latestSubmittedOffset0.updateAndGet { it -> it.coerceAtLeast(offset) }
             val result = MessageMetadata(latest, Instant.ofEpochMilli(output.end.timestamp))
-            LOGGER.info("Appended message, submit end seq: {}, submit end ts: {}, message seq: {}, message ts: {}", output.end.seqNum, output.end.timestamp, result.logOffset, result.logTimestamp)
+            LOGGER.trace("Appended message, seq: {}, ts: {}", result.logOffset, result.logTimestamp)
 
             result
         }
@@ -96,6 +99,7 @@ class S2Log internal constructor(
                         val output = try {
                             s.get(Duration.ofSeconds(1)).getOrNull()
                         } catch (_: InterruptedException) {
+                            LOGGER.warn("subscriber interrupted while polling for new records")
                             throw InterruptedException()
                         }
 
@@ -110,16 +114,13 @@ class S2Log internal constructor(
                                         Instant.ofEpochMilli(r.timestamp),
                                         Message.parse(r.body.asReadOnlyByteBuffer())
                                     )
-                                    LOGGER.info("Subscriber received record, seq: {}, ts: {}", r.seqNum, r.timestamp)
-                                    LOGGER.info(
-                                        "Subscriber result, offset: {}, ts: {}",
-                                        result.logOffset,
-                                        result.logTimestamp
-                                    )
+                                    LOGGER.trace("subscriber will process record, seq: {}, ts: {}", result.logOffset, result.logTimestamp)
+
                                     result
                                 })
                         }
                     }
+                    LOGGER.info("Closing subscription")
                 }
             }
         }
@@ -168,7 +169,7 @@ class S2Log internal constructor(
                 .withMaxAppendInflightBytes(maxAppendInFlightBytes)
                 .withRetryDelay(retryDelay)
                 .build()
-            LOGGER.info("Opening log for basin: {}, stream: {}", basin, stream)
+            LOGGER.info("Opening S2 log at basin: {}, stream: {}", basin, stream)
             val client = StreamClient.newBuilder(config, basin, stream).build()
 
             return S2Log(client, appendTimeout, readBufferBytes, epoch)
