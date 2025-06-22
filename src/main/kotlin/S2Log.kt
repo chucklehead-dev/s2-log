@@ -57,7 +57,7 @@ class S2Log internal constructor(
 
     private fun readLatestSubmittedMessage(client: StreamClient): LogOffset {
         val tail = client.checkTail().get()
-        LOGGER.trace("checkTail result, seq: {}, ts: {}", tail.seqNum, tail.timestamp)
+        LOGGER.info("Opened log with tail seq: {} and ts: {}", tail.seqNum, tail.timestamp)
         return tail.seqNum - 1
     }
     private val latestSubmittedOffset0 = AtomicLong(readLatestSubmittedMessage(client))
