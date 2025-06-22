@@ -97,7 +97,7 @@ class S2Log internal constructor(
                 runInterruptible(Dispatchers.IO) {
                     while (!session.isClosed) {
                         val output = try {
-                            s.get(Duration.ofSeconds(1)).getOrNull()
+                            s.get(Duration.ofMinutes(1)).getOrNull()
                         } catch (_: InterruptedException) {
                             LOGGER.warn("subscriber interrupted while polling for new records")
                             throw InterruptedException()
@@ -145,9 +145,9 @@ class S2Log internal constructor(
         val token: String,
         val basin: String,
         val stream: String,
-        var maxAppendInFlightBytes: Int = (4 * 1024 * 1024),
-        var appendTimeout: Duration = Duration.ofSeconds(5),
-        var readBufferBytes: Int = (4 * 1024 * 1024),
+        var maxAppendInFlightBytes: Int = (32 * 1024 * 1024),
+        var appendTimeout: Duration = Duration.ofSeconds(10),
+        var readBufferBytes: Int = (32 * 1024 * 1024),
         var retryDelay: Duration = Duration.ofSeconds(1),
         var epoch: Int = 0
     ) : Log.Factory {
