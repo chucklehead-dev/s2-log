@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.bundles.xtdb)
     implementation(libs.kotlinx.coroutines.guava)
     runtimeOnly(libs.guava)
+    runtimeOnly(libs.bundles.grpc)
     implementation(libs.clojure)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))

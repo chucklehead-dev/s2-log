@@ -7,6 +7,7 @@ kotlin-coroutines = "1.10.2"
 junit = "5.12.2"
 junit-launcher = "1.12.2"
 guava = "33.4.8-jre"
+grpc = "1.70.0"
 
 [libraries]
 junit-jupiter-api={ group="org.junit.jupiter", name="junit-jupiter-api", version.ref="junit" }
@@ -21,7 +22,9 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines-guava" }
 mockk = { group = "io.mockk", name = "mockk", version = "1.13.17" }
 guava = { module = "com.google.guava:guava", version.ref = "guava"}
+grpc-xds = {module = "io.grpc:grpc-xds", version.ref = "grpc"}
 
 [bundles]
 xtdb = ["xtdb-api", "xtdb-core"]
 s2 = ["s2-sdk"]
+grpc = ["grpc-xds"]
