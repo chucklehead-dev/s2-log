@@ -4,7 +4,7 @@ A [Log](https://docs.xtdb.com/ops/config/log.html) implementation for [XTDB](htt
 
 ## Current Status
 
-Integration tests based on [Kafka](https://github.com/xtdb/xtdb/blob/main/modules/kafka/src/test/kotlin/xtdb/api/log/KafkaLogTest.kt) module are passing, but encountering packaging/dependency issues when trying to test against [xtdb-bench](https://github.com/xtdb/xtdb/tree/main/modules/bench).
+Working...I think. Known limitation of 1MB maximum tx log message size with S2. 
 
 ## Setup
 
@@ -27,7 +27,7 @@ See [here](https://docs.github.com/en/packages/working-with-a-github-packages-re
 
 #### Clojure
 ```clojure
-{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.3"}}
+{:deps {dev.chucklehead/s2-log {:mvn/version "0.0.4"}}
  :mvn/repos {"chucklehead" {:url "https://maven.pkg.github.com/chucklehead-dev/s2-log"}
              "s2" {:url "https://maven.pkg.github.com/s2-streamstore/s2-sdk-java"}}}
 ```
