@@ -44,5 +44,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+.clj-kondo/.cache/
+.lsp/.cache/
+
+
 
 references/
