@@ -1,0 +1,11 @@
+edition = "2023";
+
+package chucklehead.xtdb.s2.proto;
+
+option java_multiple_files = true;
+
+message S2LogConfig {
+    string log_cluster_alias = 1;
+    string stream = 2;
+    int32 epoch = 3;
+}

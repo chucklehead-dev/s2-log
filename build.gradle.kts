@@ -5,6 +5,7 @@ plugins {
     id("dev.clojurephant.clojure") version "0.8.0"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization")
+    id("com.google.protobuf") version "0.9.4"
     `maven-publish`
 }
 
@@ -38,6 +39,7 @@ dependencies {
     implementation(libs.bundles.s2)
     implementation(libs.bundles.xtdb)
     implementation(libs.kotlinx.coroutines.guava)
+    implementation(libs.protobuf.kotlin)
     runtimeOnly(libs.guava)
     runtimeOnly(libs.bundles.grpc)
     implementation(libs.clojure)
@@ -76,6 +78,20 @@ tasks.jar {
 clojure {
     builds.forEach {
         it.checkNamespaces.empty()
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.31.1"
+    }
+
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                create("kotlin")
+            }
+        }
     }
 }
 
